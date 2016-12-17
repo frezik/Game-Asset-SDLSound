@@ -21,9 +21,31 @@
 # CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
 # POSSIBILITY OF SUCH DAMAGE.
-use Test::More tests => 2;
+use Test::More 
+    skip_all => "Add flac file to t_data/test.zip";
+    #tests => 2;
 use strict;
 use warnings;
+use Game::Asset;
+use Game::Asset::SDLSound;
+use Game::Asset::SDLSound::Manager;
 
-use_ok( 'Game::Asset::SDLSound' );
-use_ok( 'Game::Asset::SDLSound::Manager' );
+my $asset = Game::Asset->new({
+    file => 't_data/test.zip',
+});
+
+my $sound = $asset->get_by_name( 'test_flac' );
+isa_ok( $sound => 'Game::Asset::SDLSound' );
+
+
+SKIP: {
+    skip "Set SOUND_TEST=1 environment var to run these tests", 1
+        unless $ENV{SOUND_TEST};
+
+    my $sdl = Game::Asset::SDLSound::Manager->new;
+    $sdl->init;
+    $sound->play;
+    while( $sdl->is_playing ) { }
+    pass( "Played sound" );
+    $sdl->finish;
+}

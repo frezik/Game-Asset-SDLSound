@@ -29,6 +29,18 @@ use warnings;
 use Moose;
 use namespace::autoclean;
 
+use constant type => 'sound';
+
+with 'Game::Asset::Type';
+
+
+sub _process_content
+{
+    my ($self, $content) = @_;
+    # TODO load content into memory for playing
+    return;
+}
+
 
 no Moose;
 __PACKAGE__->meta->make_immutable;

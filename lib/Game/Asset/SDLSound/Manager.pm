@@ -21,9 +21,76 @@
 # CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
 # POSSIBILITY OF SUCH DAMAGE.
-use Test::More tests => 2;
+package Game::Asset::SDLSound::Manager;
+
 use strict;
 use warnings;
+use Moose;
+use namespace::autoclean;
+use SDL ();
+use SDL::Mixer ();
+use SDL::Mixer::Music ();
 
-use_ok( 'Game::Asset::SDLSound' );
-use_ok( 'Game::Asset::SDLSound::Manager' );
+has '_is_init_done' => (
+    is => 'rw',
+    isa => 'Bool',
+    default => 0,
+);
+has 'freq' => (
+    is => 'ro',
+    isa => 'Int',
+    default => 44_100,
+);
+has 'format' => (
+    is => 'ro',
+    default => SDL::Mixer::MIX_DEFAULT_FORMAT,
+);
+has 'channels' => (
+    is => 'ro',
+    isa => 'Int',
+    default => 2,
+);
+has 'chunksize' => (
+    is => 'ro',
+    isa => 'Int',
+    default => 4096,
+);
+
+
+sub init
+{
+    my ($self) = @_;
+    return if $self->_is_init_done;
+
+    SDL::init( SDL::SDL_INIT_AUDIO );
+    SDL::Mixer::init(
+        SDL::Mixer::MIX_INIT_FLAC
+        | SDL::Mixer::MIX_INIT_MOD
+        | SDL::Mixer::MIX_INIT_MP3
+        | SDL::Mixer::MIX_INIT_OGG
+    );
+
+    SDL::Mixer::open_audio( 
+        $self->freq,
+        $self->format,
+        $self->channels,
+        $self->chunksize,
+    );
+
+    $self->_is_init_done( 1 );
+    return;
+}
+
+sub finish
+{
+    my ($self) = @_;
+    SDL::Mixer::quit;
+    $self->_is_init_done( 0 );
+    return;
+}
+
+no Moose;
+__PACKAGE__->meta->make_immutable;
+1;
+__END__
+
