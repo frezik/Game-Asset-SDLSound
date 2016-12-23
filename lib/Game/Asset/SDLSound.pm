@@ -71,9 +71,48 @@ __END__
 
 =head1 SYNOPSIS
 
+    my $asset = Game::Asset->new({
+        file => 't_data/test.zip',
+    });
+    my $sound = $asset->get_by_name( 'test_wav' );
+
+    my $sdl = Game::Asset::SDLSound::Manager->new;
+    $sdl->init;
+    $sound->play;
+    while( $sdl->is_playing ) { }
+    $sdl->finish;
+
+
+    # In your index.yml for the Game::Asset archive, add:
+    flac: Game::Asset::SDLSound
+    mp3: Game::Asset::SDLSound
+    ogg: Game::Asset::SDLSound
+    wav: Game::Asset::SDLSound
+
 =head1 DESCRIPTION
 
+Loads sound files from a L<Game::Asset> archive for playing in SDL. Support 
+is provided for FLAC, OGG, MP3, and WAV files. Note that which of these can 
+be played will depend on how your SDL_Mixer library is compiled. For more 
+information on supported formats, see L<SDL::Mixer>.
+
 =head1 METHODS
+
+=head2 play
+
+Starts playing the sound. Before calling this, you will need to setup the 
+SDL mixer environment. See L<Game::Asset::SDLSound::Manager> for more 
+information.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<SDL::Mixer>
+
+=item * L<SDL::Mixer::Music>
+
+=back
 
 =head1 LICENSE
 
