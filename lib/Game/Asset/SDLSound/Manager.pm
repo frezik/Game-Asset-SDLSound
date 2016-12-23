@@ -81,6 +81,12 @@ sub init
     return;
 }
 
+sub is_playing
+{
+    my ($self) = @_;
+    return SDL::Mixer::Music::playing_music();
+}
+
 sub finish
 {
     my ($self) = @_;

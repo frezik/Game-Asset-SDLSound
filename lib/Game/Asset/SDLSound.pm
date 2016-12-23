@@ -28,16 +28,34 @@ use strict;
 use warnings;
 use Moose;
 use namespace::autoclean;
+use SDL ();
+use SDL::Mixer ();
+use SDL::Mixer::Music ();
+use SDL::RWOps ();
 
 use constant type => 'sound';
 
 with 'Game::Asset::Type';
 
+has '_sound' => (
+    is => 'rw',
+    isa => 'Maybe[SDL::RWOps]',
+);
+
+
+sub play
+{
+    my ($self) = @_;
+    my $music = SDL::Mixer::Music::load_MUS_RW( $self->_sound );
+    SDL::Mixer::Music::play_music( $music, 0 );
+    return;
+}
 
 sub _process_content
 {
     my ($self, $content) = @_;
-    # TODO load content into memory for playing
+    my $rw = SDL::RWOps->new_const_mem( $content );
+    $self->_sound( $rw );
     return;
 }
 
