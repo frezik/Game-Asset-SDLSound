@@ -37,6 +37,9 @@ use constant type => 'sound';
 
 with 'Game::Asset::Type';
 
+has '_content' => (
+    is => 'rw',
+);
 has '_sound' => (
     is => 'rw',
     isa => 'Maybe[SDL::RWOps]',
@@ -46,7 +49,10 @@ has '_sound' => (
 sub play
 {
     my ($self) = @_;
-    my $music = SDL::Mixer::Music::load_MUS_RW( $self->_sound );
+    my $content = $self->_content;
+    my $rw = SDL::RWOps->new_const_mem( $content );
+
+    my $music = SDL::Mixer::Music::load_MUS_RW( $rw );
     SDL::Mixer::Music::play_music( $music, 0 );
     return;
 }
@@ -54,8 +60,7 @@ sub play
 sub _process_content
 {
     my ($self, $content) = @_;
-    my $rw = SDL::RWOps->new_const_mem( $content );
-    $self->_sound( $rw );
+    $self->_content( $content );
     return;
 }
 
